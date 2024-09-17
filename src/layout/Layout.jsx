@@ -59,7 +59,7 @@ function Layout() {
         <div className="flex w-[20%] h-full justify-around items-center md:justify-center">
           {/* Login button centered on larger screens */}
           <Button className="justify-self-center  hidden md:block">
-            Login
+            <Link to='/login'> Login </Link>
           </Button>
 
           {/* Menu Button with equal space on smaller screens */}
@@ -101,7 +101,7 @@ function Layout() {
               </Link>
             </li>
             <li className="flex justify-center items-center w-full py-3">
-              <Button className="w-full mx-6" >Login</Button>
+               <Button className="w-full mx-6" > <Link to='/login'>Login</Link>   </Button> 
             </li>
           </ul>
         </div>

@@ -10,6 +10,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage"))
 const SavedTrip = lazy(() => import("./pages/SavedTrip"))
 const SearchPage = lazy(() => import("./pages/SearchPage"))
 const About = lazy(()=>import("./pages/About"))
+const PremiumSearch = lazy(()=>import("./pages/PremiumSearch.jsx"))
 
 
 function App() {
@@ -42,7 +43,7 @@ function App() {
         )
       },
       {
-        path:"SavedTrip",
+        path:"saved-trip",
         element:(
           <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
             <SavedTrip/>
@@ -55,6 +56,15 @@ function App() {
         element:(
           <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
             <LoginPage/>
+          </Suspense>
+        )
+      },
+
+      {
+        path:"premium-search",
+        element:(
+          <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
+            <PremiumSearch/>
           </Suspense>
         )
       },
