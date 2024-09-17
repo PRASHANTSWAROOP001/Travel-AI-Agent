@@ -9,7 +9,7 @@ import HomePage from "./pages/HomePage"
 const LoginPage = lazy(() => import("./pages/LoginPage"))
 const SavedTrip = lazy(() => import("./pages/SavedTrip"))
 const SearchPage = lazy(() => import("./pages/SearchPage"))
-const RegistrationPage = lazy(()=>import("./pages/RegistrationPage"))
+const About = lazy(()=>import("./pages/About"))
 
 
 function App() {
@@ -25,10 +25,10 @@ function App() {
       },
 
       {
-        path:"Registration",
+        path:"About",
         element:(
           <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
-            <RegistrationPage/>
+            <About/>
           </Suspense>
         )
       },

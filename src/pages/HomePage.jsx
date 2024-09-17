@@ -1,8 +1,8 @@
-import React from 'react';
-import { PlaneIcon, MapPin, Calendar, Plane } from 'lucide-react';
+import { useEffect, React, useState } from 'react';
+import { MapPin, Calendar, Plane } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import {
   Card,
@@ -19,7 +19,35 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
+import Register from './RegistrationPage';
+
 function HomePage() {
+
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const [isOpen, setIsOpen] = useState(false)
+
+  const handleOverlayClick = (e) => {
+
+    if (e.target === e.currentTarget) {
+      setIsOpen(false);
+    }
+    
+  };
+
+  useEffect(() => {
+
+    if (searchParams.get("openModal") === 'true') {
+      setIsOpen(true)
+
+      searchParams.delete("openModal")
+      setSearchParams(searchParams)
+    }
+
+  }, [searchParams])
+
+
+
   return (
     <div className="flex flex-col w-full min-h-screen">
       <main className="w-full">
@@ -40,10 +68,9 @@ function HomePage() {
                   {' '}
                   <Button> Get Started </Button>{' '}
                 </Link>
-                <Link to="/Registration">
-                  {' '}
-                  <Button variant="green"> Register </Button>{' '}
-                </Link>
+
+                <Button onClick={() => (setIsOpen(true))} variant="green"> Register </Button>{' '}
+
               </div>
             </div>
           </div>
@@ -195,6 +222,18 @@ function HomePage() {
             </Accordion>
           </div>
         </section>
+
+        {isOpen && (
+          <div
+            onClick={handleOverlayClick}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          >
+
+            <Register />
+
+          </div>
+        )}
+
       </main>
     </div>
   );

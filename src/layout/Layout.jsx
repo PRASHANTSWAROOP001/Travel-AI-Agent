@@ -22,7 +22,7 @@ function Layout() {
       setOpen(false);
     }
   };
-  
+
   useEffect(() => {
     window.addEventListener('scroll', closeOnScroll);
     window.addEventListener('resize', closeOnResize);
@@ -51,7 +51,7 @@ function Layout() {
             <Link to="/search">Search</Link>
           </li>
           <li>
-            <Link to="/Registration">Register</Link>
+            <Link to="/About">About</Link>
           </li>
         </ul>
 
@@ -94,14 +94,14 @@ function Layout() {
             </li>
             <li className="w-full">
               <Link
-                to="/Registration"
+                to="/About"
                 className="block py-3 text-center w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
               >
-                Register
+                About
               </Link>
             </li>
             <li className="flex justify-center items-center w-full py-3">
-              <Button className="w-full mx-6">Login</Button>
+              <Button className="w-full mx-6" >Login</Button>
             </li>
           </ul>
         </div>
