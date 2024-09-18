@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
-import Link from 'next/link';
+import {Link} from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -17,21 +17,55 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import ReactMarkdown from 'react-markdown';
 
+import { isUserLoggedIn } from '../utils/supbase';
+
+import { useNavigate } from 'react-router-dom';
 export default function PremiumSearchPage() {
+
   const [city, setCity] = useState('');
   const [days, setDays] = useState(0);
   const [loading, setLoading] = useState(false);
   const [travelPlan, setTravelPlan] = useState(null);
   const [progress, setProgress] = useState(0);
   const [searchAlert, setSearchAlert] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  const navigate = useNavigate()
 
   const handleCity = (e) => {
     setCity(e.target.value);
   };
 
+  const checkingAuthentication = async () =>{
+    try {
+
+      const login = await isUserLoggedIn()
+
+      if(!login){
+           navigate("/login")
+      }
+      else{
+        setCheckingAuth(false)
+      }
+      
+    }
+    catch(error){
+      console.error("Error while checking logged in user at searchPage: ", error)
+      throw error;
+    }
+
+  }
+
+  useEffect(()=>{
+    checkingAuthentication();
+  },[])
+
+
+
   const handleDays = (e) => {
     setDays(e.target.value);
   };
+
 
   const showAlert = () => {
     setSearchAlert(true);
@@ -57,7 +91,11 @@ export default function PremiumSearchPage() {
     };
   }, [loading]);
 
-  const AWANLLM_API_KEY = process.env.NEXT_PUBLIC_AWAN_LLM;
+
+
+
+
+  const AWANLLM_API_KEY = import.meta.env.VITE_AWAN_LLM
 
   const prompt = `Plan a ${days}-day trip to ${city}. Start with a title like "Experience [CITY]" that summarizes the overall trip theme. Each day should follow this structure:
   
@@ -154,11 +192,12 @@ export default function PremiumSearchPage() {
               </div>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
+          <CardFooter className="flex justify-between gap-4">
             <Button onClick={search} className="w-full">Search</Button>
-            <Link href="/saved-trips" passHref>
-              <Button variant="outline" className="w-full">Saved Trips</Button>
-            </Link>
+            <Button variant="outline" className="w-full"><Link to="/saved-trips" >
+             Saved Trip
+             </Link></Button>
+
           </CardFooter>
         </Card>
 

@@ -38,7 +38,10 @@ export default function LoginPage() {
 
     try {
       const data = await logIn({email,password})
-      showTemporaryAlert("Logged In SuccessFully !!", 3000)
+      showTemporaryAlert("Logged In SuccessFully && Naviagting To Search !!", 3000)
+      setTimeout(()=>{
+        navigate("/premium-search")
+      },3000)
 
     } catch (error) {
       showTemporaryAlert("Error While Login !!", 3000)

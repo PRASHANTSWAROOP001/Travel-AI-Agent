@@ -2,7 +2,7 @@ import { Link, Outlet } from 'react-router-dom';
 import { X, MenuIcon, PlaneIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
 
 function Layout() {
   const [open, setOpen] = useState(false);

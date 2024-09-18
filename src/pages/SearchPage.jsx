@@ -32,7 +32,16 @@ function SearchPage() {
   };
 
   const handleDays = (e) => {
-    setDays(e.target.value);
+    const day = Number(e.target.value)
+    if (day > 0 && day <=3){
+      setDays(day)
+    }
+    else if (day > 3){
+      setDays(3)
+    }
+    else{
+      setDays(1)
+    }
   };
 
   const showAlert = () => {
@@ -134,11 +143,14 @@ function SearchPage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8 gap-8">
-      <div className="w-full max-w-[90%] md:max-w-none md:w-auto flex flex-col md:flex-row items-center justify-center gap-8">
-        <Card className="w-full md:w-[350px] h-fit shadow-lg duration-500 hover:scale-105">
+      <div className="w-full flex flex-col lg:flex-row gap-8 justify-center lg:items-start lg:justify-start">
+        {/* Left side search card */}
+        <Card className="w-full md:w-[350px] lg:w-[350px] shadow-lg duration-500 hover:scale-105 lg:sticky lg:top-20">
           <CardHeader>
             <CardTitle className="font-semibold text-xl">Plan Your Trip</CardTitle>
-            <CardDescription className="text-lg">Generate Trip Plan With One Click.</CardDescription>
+            <CardDescription className="text-lg">
+              Generate Trip Plan With One Click.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form>
@@ -171,8 +183,9 @@ function SearchPage() {
           </CardFooter>
         </Card>
 
+        {/* Right side travel plan */}
         {travelPlan && (
-          <Card className="w-full md:w-[60%] max-h-[80vh] overflow-y-auto">
+          <Card className="w-full lg:w-[70%] max-h-[80vh] overflow-y-auto">
             <CardContent className="px-4 py-4">
               <ReactMarkdown>{travelPlan}</ReactMarkdown>
             </CardContent>
@@ -180,24 +193,24 @@ function SearchPage() {
         )}
       </div>
 
+      {/* Loading progress */}
       {loading && (
         <div className="w-full max-w-[90%] md:max-w-[80%]">
           <Progress value={progress} />
         </div>
       )}
 
+      {/* Search alert */}
       {searchAlert && (
-        <Alert variant= 'default' className="w-full max-w-[90%] md:max-w-[80%]">
+        <Alert variant="default" className="w-full max-w-[90%] md:max-w-[80%]">
           <Terminal className="h-4 w-4" />
           <AlertTitle>In Progress...</AlertTitle>
-          <AlertDescription>    
-          Please Wait. Search Request Has Been Made To Server. Be Patient.
+          <AlertDescription>
+            Please Wait. Search Request Has Been Made To Server. Be Patient.
           </AlertDescription>
         </Alert>
       )}
     </div>
-
   );
 }
-
 export default SearchPage;
