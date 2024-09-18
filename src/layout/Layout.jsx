@@ -2,11 +2,14 @@ import { Link, Outlet } from 'react-router-dom';
 import { X, MenuIcon, PlaneIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect,} from 'react';
+
+import { isUserLoggedIn, logOut } from '@/utils/supbase';
+import supabase from '@/utils/supbase';
 
 function Layout() {
   const [open, setOpen] = useState(false);
-
+  const [isLogin, setIsLogin] = useState(false)
   const openMenu = () => {
     setOpen((prev) => !prev);
   };
@@ -22,6 +25,42 @@ function Layout() {
       setOpen(false);
     }
   };
+
+
+  useEffect(()=>{
+    const checkUserStatus = async () =>{
+      const login = await isUserLoggedIn()
+      console.log("user logged in : ", login)
+      setIsLogin(login)
+    }
+
+    checkUserStatus();
+
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setIsLogin(true);  // User is logged in
+      } else {
+        setIsLogin(false); // User is logged out
+      }
+    });
+    
+    return () =>{
+      authListener?.subscription.unsubscribe()
+    }
+
+
+  },[])
+
+
+
+  const handleLogout = async () =>{
+    await logOut()
+    console.log("user log out: ")
+    setIsLogin(false)
+    
+  }
+
 
   useEffect(() => {
     window.addEventListener('scroll', closeOnScroll);
@@ -53,14 +92,19 @@ function Layout() {
           <li>
             <Link to="/About">About</Link>
           </li>
+          {isLogin && ( <li>
+            <Link to="/premium-search">Premium Search</Link>
+          </li>)}
         </ul>
 
         {/* Div to handle login and menu button */}
         <div className="flex w-[20%] h-full justify-around items-center md:justify-center">
           {/* Login button centered on larger screens */}
-          <Button className="justify-self-center  hidden md:block">
+          {isLogin ?(<Button onClick={handleLogout} className="justify-self-center  hidden md:block">
+            Logout
+          </Button>) : (<Button className="justify-self-center  hidden md:block">
             <Link to='/login'> Login </Link>
-          </Button>
+          </Button>)}
 
           {/* Menu Button with equal space on smaller screens */}
           <Button
@@ -100,8 +144,16 @@ function Layout() {
                 About
               </Link>
             </li>
+            {isLogin && (  <li className="w-full">
+              <Link
+                to="/premium-search"
+                className="block py-3 text-center w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+              >
+                Premium Search
+              </Link>
+            </li>)}
             <li className="flex justify-center items-center w-full py-3">
-               <Button className="w-full mx-6" > <Link to='/login'>Login</Link>   </Button> 
+               {isLogin ? (<Button className="w-full mx-6" onClick={handleLogout} > Logout  </Button> ):(<Button className="w-full mx-6" > <Link to='/login'>Login</Link>   </Button> )}
             </li>
           </ul>
         </div>

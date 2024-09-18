@@ -63,7 +63,12 @@ export const isUserLoggedIn =  async () =>{
        
         const { data: { user } } = await supabase.auth.getUser()
 
-        return user !== null;
+        if(user?.aud === "authenticated"){
+            return true
+        }
+        else{
+            return false
+        }
 
         
     } catch (error) {
@@ -82,3 +87,5 @@ export const getCurrentUser = async () => {
       throw error;
     }
   };
+
+  export default supabase;

@@ -41,8 +41,10 @@ export default function PremiumSearchPage() {
 
       const login = await isUserLoggedIn()
 
-      if(!login){
-           navigate("/login")
+      console.log("checking login at search page.",login)
+
+      if (login == false){
+        navigate("/login")
       }
       else{
         setCheckingAuth(false)
