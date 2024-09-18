@@ -23,6 +23,7 @@ export default function LoginPage() {
     setShowAlert(true)
     setTimeout(() => setShowAlert(false), duration)
   }
+  
   const navigate = useNavigate()
 
   const handleLogin =  async (e) => {

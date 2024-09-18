@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -12,9 +12,25 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+
+
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+  SelectLabel,
+} from "@/components/ui/select"
+
+
+
 import ReactMarkdown from 'react-markdown';
 
 import { isUserLoggedIn } from '../utils/supbase';
@@ -27,8 +43,23 @@ export default function PremiumSearchPage() {
   const [loading, setLoading] = useState(false);
   const [travelPlan, setTravelPlan] = useState(null);
   const [progress, setProgress] = useState(0);
-  const [searchAlert, setSearchAlert] = useState(false);
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("")
+  const [alertTitle, setAlertTitle] = useState("")
+
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  const [options, setOptions] = useState("");
+
+  const showTemporaryAlert = (title, message, duration) => {
+    setAlertTitle(title)
+    setAlertMessage(message)
+    setShowAlert(true)
+
+    setTimeout(() => (setShowAlert(false)), duration)
+
+  }
 
   const navigate = useNavigate()
 
@@ -36,45 +67,47 @@ export default function PremiumSearchPage() {
     setCity(e.target.value);
   };
 
-  const checkingAuthentication = async () =>{
+  const checkingAuthentication = async () => {
     try {
 
       const login = await isUserLoggedIn()
 
-      console.log("checking login at search page.",login)
+      console.log("checking login at search page.", login)
 
-      if (login == false){
+      if (login == false) {
         navigate("/login")
       }
-      else{
+      else {
         setCheckingAuth(false)
       }
-      
+
     }
-    catch(error){
+    catch (error) {
       console.error("Error while checking logged in user at searchPage: ", error)
       throw error;
     }
 
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     checkingAuthentication();
-  },[])
+  }, [])
 
 
 
   const handleDays = (e) => {
-    setDays(e.target.value);
+    let day = Number(e.target.value)
+    if (day > 0 && day <= 7) {
+      setDays(day)
+    }
+    else if (days > 7) {
+      setDays(7)
+    }
+    else {
+      setDays(1)
+    }
   };
 
-
-  const showAlert = () => {
-    setSearchAlert(true);
-    setTimeout(() => {
-      setSearchAlert(false);
-    }, 3000);
-  };
 
   useEffect(() => {
     let increaseProgress;
@@ -86,7 +119,7 @@ export default function PremiumSearchPage() {
           }
           return prev;
         });
-      }, 1000);
+      }, 2000);
     }
     return () => {
       clearInterval(increaseProgress);
@@ -99,23 +132,27 @@ export default function PremiumSearchPage() {
 
   const AWANLLM_API_KEY = import.meta.env.VITE_AWAN_LLM
 
-  const prompt = `Plan a ${days}-day trip to ${city}. Start with a title like "Experience [CITY]" that summarizes the overall trip theme. Each day should follow this structure:
+   const prompt = `Create a personalized ${days}-day trip itinerary for ${city}. ${options.length > 0 ? `Please include this activity in your plan if possible: ${options}.` : ""} Begin with a title that reflects the overall theme of the trip, such as "Explore the Best of [CITY]."
+
+  For each day, follow this format:
   
-  Day Theme: Briefly describe the main theme or experience for the day (e.g., exploring local cuisine, visiting temples, enjoying outdoor activities, etc.).
-  Morning: List of activities, accommodations, and food options that align with the day's theme.
-  Afternoon: List of activities and food options.
-  Evening: List of activities, accommodations, and food options.
-  After listing the agenda for all days:
+  1. **Day Theme**: Briefly describe the focus of the day (e.g., cultural experiences, nature exploration, historical tours).
+  2. **Morning**: List activities, food options, and any notable accommodations.
+  3. **Afternoon**: Continue with planned activities and meal suggestions.
+  4. **Evening**: Suggest nightlife, restaurants, or evening relaxation spots.
   
-  Include a 'General Tips' section with travel recommendations, safety tips, and cultural notes specific to [CITY].
-  Provide a 'Budget Breakdown' with estimated costs for accommodations, food, and activities.
-  Give all the data in MarkDown Format.`;
+  Once all days are planned, provide:
+  - **General Travel Tips**: Practical advice for navigating [CITY], including safety tips, best travel times, and cultural nuances.
+  - **Budget Breakdown**: A rough estimate of the costs involved for accommodations, food, and activities, categorized by day.
+  
+  All output should be formatted in **Markdown**.`
 
   const search = async () => {
     try {
       setLoading(true);
+      showTemporaryAlert("In Progress...", "Please Wait. Search Request Has Been Made To Server. Be Patient.", 3000)
       setProgress(0);
-      showAlert();
+
       const response = await fetch(
         'https://api.awanllm.com/v1/chat/completions',
         {
@@ -149,18 +186,23 @@ export default function PremiumSearchPage() {
         const travelPlanData = data.choices[0].message.content;
         setTravelPlan(travelPlanData);
         setProgress(100);
-      } 
+      }
       else {
         console.error('Data Could Not Be Fetched', response.statusText);
       }
     } catch (error) {
       console.error('Error occurred:', error);
+      showTemporaryAlert("Could Not Search", "Error Happend While Searching", 3000)
     } finally {
       setCity('');
       setDays(0);
       setLoading(false);
     }
   };
+
+  const handleOptions = (value) =>{
+    setOptions(value)
+  }
 
   return (
     <div className="min-h-screen w-full p-4 md:p-8">
@@ -192,13 +234,44 @@ export default function PremiumSearchPage() {
                   placeholder="Enter Days"
                 />
               </div>
+
+              <div className="flex flex-col space-y-3">
+                <Label htmlFor="framework">Customiztion</Label>
+                <Select onValueChange={handleOptions}>
+                  <SelectTrigger id="framework">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectGroup>
+                      <SelectLabel>Popular Options</SelectLabel>
+                      <SelectItem value="cuisines">Explore Local Cuisines</SelectItem>
+                      <SelectItem value="landmarks">Visit Historical Landmarks</SelectItem>
+                      <SelectItem value="temples">Explore Local Temples</SelectItem>
+                      <SelectItem value="nature">Relax at Scenic Nature Spots</SelectItem>
+                      <SelectItem value="nightlife">Discover Nightlife & Entertainment</SelectItem>
+                      <SelectItem value="shopping">Shopping & Local Markets</SelectItem>
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Unique Options</SelectLabel>
+                      <SelectItem value="hidden-gems">Hidden Cultural Gems</SelectItem>
+                      <SelectItem value="adventure">Outdoor Adventure & Hiking</SelectItem>
+                      <SelectItem value="art-architecture">Art & Architecture Exploration</SelectItem>
+                      <SelectItem value="wellness">Wellness & Spa Retreats</SelectItem>
+                      <SelectItem value="sustainable">Sustainable Travel</SelectItem>
+                      <SelectItem value="craftsmanship">Local Craftsmanship & Workshops</SelectItem>
+                      <SelectItem value="photography">Photographer`s Paradise</SelectItem>
+                    </SelectGroup>
+
+                  </SelectContent>
+                </Select>
+              </div>
             </form>
           </CardContent>
           <CardFooter className="flex justify-between gap-4">
-            <Button onClick={search} className="w-full">Search</Button>
+            <Button onClick={search} disabled={loading} className="w-full">{loading ? "Searching ...": "Search"}</Button>
             <Button variant="outline" className="w-full"><Link to="/saved-trips" >
-             Saved Trip
-             </Link></Button>
+              Saved Trip
+            </Link></Button>
 
           </CardFooter>
         </Card>
@@ -221,15 +294,16 @@ export default function PremiumSearchPage() {
         </div>
       )}
 
-      {searchAlert && (
+      {showAlert && (
         <Alert variant="default" className="w-full mt-8">
           <Terminal className="h-4 w-4" />
-          <AlertTitle>In Progress...</AlertTitle>
-          <AlertDescription>    
-            Please Wait. Search Request Has Been Made To Server. Be Patient.
+          <AlertTitle> {alertTitle}</AlertTitle>
+          <AlertDescription>
+            {alertMessage}
           </AlertDescription>
         </Alert>
       )}
+
     </div>
   );
 }
