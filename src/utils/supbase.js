@@ -88,4 +88,28 @@ export const getCurrentUser = async () => {
     }
   };
 
+  export const insertData = async (city, markdown_data) => {
+    const { data: user, error: authError } = await supabase.auth.getUser();
+    
+    if (user) {
+      const { data, error } = await supabase
+        .from("Travel Plan")
+        .insert({
+          trip_name: city,
+          trip_data: markdown_data,
+          user_id: user.user.id
+        })
+        .select(); // Optional, if you want to return the inserted data
+  
+      if (error) {
+        console.error("Error while adding data:", error);
+      } else {
+        console.log("Data inserted successfully:", data);
+      }
+  
+    } else {
+      console.log("User not authenticated or an authentication error occurred:", authError);
+    }
+  };
+  
   export default supabase;

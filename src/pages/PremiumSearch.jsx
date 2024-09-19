@@ -33,7 +33,7 @@ import {
 
 import ReactMarkdown from 'react-markdown';
 
-import { isUserLoggedIn } from '../utils/supbase';
+import { isUserLoggedIn , insertData } from '../utils/supbase';
 
 import { useNavigate } from 'react-router-dom';
 export default function PremiumSearchPage() {
@@ -132,7 +132,7 @@ export default function PremiumSearchPage() {
 
   const AWANLLM_API_KEY = import.meta.env.VITE_AWAN_LLM
 
-   const prompt = `Create a personalized ${days}-day trip itinerary for ${city}. ${options.length > 0 ? `Please include this activity in your plan if possible: ${options}.` : ""} Begin with a title that reflects the overall theme of the trip, such as "Explore the Best of [CITY]."
+  const prompt = `Create a personalized ${days}-day trip itinerary for ${city}. ${options.length > 0 ? `Please include this activity in your plan if possible: ${options}.` : ""} Begin with a title that reflects the overall theme of the trip, such as "Explore the Best of [CITY]."
 
   For each day, follow this format:
   
@@ -194,7 +194,7 @@ export default function PremiumSearchPage() {
       console.error('Error occurred:', error);
       showTemporaryAlert("Could Not Search", "Error Happend While Searching", 3000)
     } finally {
-      setCity('');
+      setCity("")
       setDays(0);
       setLoading(false);
     }
@@ -202,6 +202,14 @@ export default function PremiumSearchPage() {
 
   const handleOptions = (value) =>{
     setOptions(value)
+  }
+
+
+  const insertTripData = async ()=>{
+    if(city && travelPlan){
+      await insertData(city,travelPlan)
+      console.log("data inserted successfully from search page.")
+    }
   }
 
   return (
@@ -269,7 +277,7 @@ export default function PremiumSearchPage() {
           </CardContent>
           <CardFooter className="flex justify-between gap-4">
             <Button onClick={search} disabled={loading} className="w-full">{loading ? "Searching ...": "Search"}</Button>
-            <Button variant="outline" className="w-full"><Link to="/saved-trips" >
+            <Button variant="outline" disabled={loading} className="w-full" onClick={insertTripData}><Link to="/saved-trips" >
               Saved Trip
             </Link></Button>
 
