@@ -19,6 +19,8 @@ import { Progress } from '../components/ui/progress';
 
 import ReactMarkdown from 'react-markdown';
 
+import  {GoogleGenerativeAI} from "@google/generative-ai"
+
 function SearchPage() {
   const [city, setCity] = useState('');
   const [days, setDays] = useState(0);
@@ -73,63 +75,40 @@ function SearchPage() {
 
   const AWANLLM_API_KEY = import.meta.env.VITE_AWAN_LLM;
 
-  const prompt = `Plan a ${days}-day trip to ${city}. Start with a title like "Experience [CITY]" that summarizes the overall trip theme. Each day should follow this structure:
-  
-  Day Theme: Briefly describe the main theme or experience for the day (e.g., exploring local cuisine, visiting temples, enjoying outdoor activities, etc.).
-  Morning: List of activities, accommodations, and food options that align with the day's theme.
-  Afternoon: List of activities and food options.
-  Evening: List of activities, accommodations, and food options.
-  After listing the agenda for all days:
-  
-  Include a 'General Tips' section with travel recommendations, safety tips, and cultural notes specific to [CITY].
-  Provide a 'Budget Breakdown' with estimated costs for accommodations, food, and activities.
-  Give all the data in MarkDown Format.`;
+  const prompt = `Plan a ${days}-day trip  itinerary to ${city}.
+
+  Day Theme: [theme]
+  Morning: [activities, accommodations, food]
+  Afternoon: [activities, food]
+  Evening: [activities, accommodations, food]
+  General Tips: [travel, safety, culture]
+  Budget Breakdown: [accommodations, food, activities] in markdown.`;
+
 
   const search = async () => {
+
+    const geminiAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API)
+
+    const model = geminiAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig:{
+        candidateCount:1,
+        maxOutputTokens:1000,
+        temperature:0.7,
+      }
+    })
+
+
     try {
       setLoading(true);
       setProgress(0);
       showAlert();
-      const response = await fetch(
-        'https://api.awanllm.com/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${AWANLLM_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'Meta-Llama-3-8B-Instruct',
-            messages: [
-              {
-                role: 'system',
-                content:
-                  'You are a travel agent that curates personalized travel plans.',
-              },
-              { role: 'user', content: prompt },
-            ],
-            repetition_penalty: 1.1,
-            temperature: 0.7,
-            top_p: 0.9,
-            top_k: 40,
-            max_tokens: 2000,
-            stream: false,
-          }),
-        }
-      );
 
-      if (response.ok) {
-        const data = await response.json();
+      const result = await model.generateContent(prompt);
 
-        const travelPlanData = data.choices[0].message.content;
-
-        setTravelPlan(travelPlanData); // Save the travel plan in the state
-
-        setProgress(100);
-      } 
-      else {
-        console.error('Data Could Not Be Fetched', response.statusText);
-      }
+      console.log(result)
+  
+   
     } catch (error) {
       console.error('Error occurred:', error);
       // Ensure loading is stopped even if there is an error
