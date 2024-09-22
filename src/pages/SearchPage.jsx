@@ -98,6 +98,10 @@ function SearchPage() {
       }
     })
 
+    if(!city){
+      alert("Please Add City");
+      return;
+    }
 
     try {
       setLoading(true);

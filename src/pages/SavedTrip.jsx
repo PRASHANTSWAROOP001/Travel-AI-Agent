@@ -10,7 +10,7 @@ function SavedTrip() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [trips, setTrips] = useState([]);
   const [selectedTrip, setSelectedTrip] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false); 
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
   // Check authentication status
@@ -79,8 +79,8 @@ function SavedTrip() {
                     <DialogHeader>
                       <DialogTitle>{selectedTrip?.trip_name}</DialogTitle>
                     </DialogHeader>
-                    <div className="mt-4 overflow-y-auto">
-                      <ReactMarkdown>{selectedTrip?.trip_data}</ReactMarkdown>
+                    <div className="mt-4 h-64 lg:h-80 overflow-y-auto mx-auto">
+                      <ReactMarkdown className="w-full">{selectedTrip?.trip_data}</ReactMarkdown>
                     </div>
                   </DialogContent>
                 </Dialog>

@@ -146,7 +146,7 @@ function HomePage() {
                 </div>
                 <h3 className="mt-4 text-xl font-bold">AI Generates Plan</h3>
                 <p className="mt-2 text-gray-500">
-                  Our AI uses Meta-Llama-3-8B-Instruct to create a customized
+                  Our AI uses Gemini 1.5 Flash Model  to create a customized
                   itinerary for you.
                 </p>
               </div>
@@ -182,7 +182,7 @@ function HomePage() {
                   How does the AI generate travel plans?
                 </AccordionTrigger>
                 <AccordionContent>
-                  Our AI uses the Awan Llm API to analyze your input
+                  Our AI uses the Google Gemini Api to analyze your input
                   (destination and duration) and generate a comprehensive travel
                   plan. It considers popular attractions, local cuisine, and
                   activities suitable for your trip length.

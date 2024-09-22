@@ -126,7 +126,7 @@ export const getCurrentUser = async () => {
       throw new Error("User Is Not Authenticated");
     }
 
-    let {data: travelPlans, error} = await supabase.from("Travel Plan").select("trip_name, trip_data").eq('user_id',user.user.id)
+    let {data: travelPlans, error} = await supabase.from("Travel Plan").select("id, trip_name, trip_data").eq('user_id',user.user.id)
 
     if (error){
       throw new Error("Error while fetching saved trip data: ", error.message)
