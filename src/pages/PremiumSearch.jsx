@@ -33,6 +33,8 @@ import {
 
 import ReactMarkdown from 'react-markdown';
 
+import  {GoogleGenerativeAI} from "@google/generative-ai"
+
 import { isUserLoggedIn , insertData } from '../utils/supbase';
 
 import { useNavigate } from 'react-router-dom';
@@ -127,74 +129,48 @@ export default function PremiumSearchPage() {
   }, [loading]);
 
 
+  const prompt = `Plan a ${days}-day trip to ${city}. ${options.length > 0 ? `Include this activity if possible: ${options}.` : ""} Start with a title like "Explore [CITY]."
 
+For each day:
+1. **Theme**: Focus of the day (e.g., culture, nature, history).
+2. **Morning**: Activities, food, accommodations.
+3. **Afternoon**: Activities and meals.
+4. **Evening**: Nightlife, restaurants, relaxation.
 
+After the plan:
+- **Travel Tips**: Advice on navigating [CITY], safety, culture, best times to visit.
+- **Budget**: Estimate costs for accommodations, food, and activities per day.
 
-  const AWANLLM_API_KEY = import.meta.env.VITE_AWAN_LLM
+Format all output in **Markdown**.`
 
-  const prompt = `Create a personalized ${days}-day trip itinerary for ${city}. ${options.length > 0 ? `Please include this activity in your plan if possible: ${options}.` : ""} Begin with a title that reflects the overall theme of the trip, such as "Explore the Best of [CITY]."
-
-  For each day, follow this format:
-  
-  1. **Day Theme**: Briefly describe the focus of the day (e.g., cultural experiences, nature exploration, historical tours).
-  2. **Morning**: List activities, food options, and any notable accommodations.
-  3. **Afternoon**: Continue with planned activities and meal suggestions.
-  4. **Evening**: Suggest nightlife, restaurants, or evening relaxation spots.
-  
-  Once all days are planned, provide:
-  - **General Travel Tips**: Practical advice for navigating [CITY], including safety tips, best travel times, and cultural nuances.
-  - **Budget Breakdown**: A rough estimate of the costs involved for accommodations, food, and activities, categorized by day.
-  
-  All output should be formatted in **Markdown**.`
 
   const search = async () => {
+
+    const geminiAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API); // Updated API Key environment variable
+
+    const model = geminiAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        candidateCount: 1,
+        maxOutputTokens: 2000,
+        temperature: 0.7,
+      },
+    });
+
     try {
       setLoading(true);
       showTemporaryAlert("In Progress...", "Please Wait. Search Request Has Been Made To Server. Be Patient.", 3000)
       setProgress(0);
 
-      const response = await fetch(
-        'https://api.awanllm.com/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${AWANLLM_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'Meta-Llama-3-8B-Instruct',
-            messages: [
-              {
-                role: 'system',
-                content:
-                  'You are a travel agent that curates personalized travel plans.',
-              },
-              { role: 'user', content: prompt },
-            ],
-            repetition_penalty: 1.1,
-            temperature: 0.7,
-            top_p: 0.9,
-            top_k: 40,
-            max_tokens: 2000,
-            stream: false,
-          }),
-        }
-      );
+      const result = await model.generateContent(prompt);
 
-      if (response.ok) {
-        const data = await response.json();
-        const travelPlanData = data.choices[0].message.content;
-        setTravelPlan(travelPlanData);
-        setProgress(100);
-      }
-      else {
-        console.error('Data Could Not Be Fetched', response.statusText);
-      }
+      setTravelPlan(result.response.text())
+
     } catch (error) {
       console.error('Error occurred:', error);
       showTemporaryAlert("Could Not Search", "Error Happend While Searching", 3000)
     } finally {
-      setCity("")
+   
       setDays(0);
       setLoading(false);
     }
@@ -290,7 +266,7 @@ export default function PremiumSearchPage() {
               <ReactMarkdown>{travelPlan}</ReactMarkdown>
             </CardContent>
             <CardFooter className="flex justify-center">
-              <Button>Save Trip</Button>
+              <Button onClick={insertTripData} >Save Trip</Button>
             </CardFooter>
           </Card>
         )}

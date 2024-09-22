@@ -93,7 +93,7 @@ function SearchPage() {
       model: "gemini-1.5-flash",
       generationConfig:{
         candidateCount:1,
-        maxOutputTokens:1000,
+        maxOutputTokens:1500,
         temperature:0.7,
       }
     })
@@ -106,13 +106,16 @@ function SearchPage() {
 
       const result = await model.generateContent(prompt);
 
-      console.log(result)
+      console.log(result.response.text())
+
+      setTravelPlan(result.response.text());
   
    
     } catch (error) {
       console.error('Error occurred:', error);
       // Ensure loading is stopped even if there is an error
     } finally {
+      setProgress(100)
       setCity('');
       setDays(0);
       setLoading(false);
