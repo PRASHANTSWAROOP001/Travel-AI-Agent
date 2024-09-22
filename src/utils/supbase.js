@@ -111,5 +111,76 @@ export const getCurrentUser = async () => {
       console.log("User not authenticated or an authentication error occurred:", authError);
     }
   };
+
+  export const fetchSavedTrip = async () =>{
+
+  try {
+    
+    const { data: user, error: authError } = await supabase.auth.getUser();
+
+    if (authError){
+      throw new Error("Authentication Error: ", authError.message)
+    }
+
+    if(!user){
+      throw new Error("User Is Not Authenticated");
+    }
+
+    let {data: travelPlans, error} = await supabase.from("Travel Plan").select("trip_name, trip_data").eq('user_id',user.user.id)
+
+    if (error){
+      throw new Error("Error while fetching saved trip data: ", error.message)
+    
+    }
+    console.log("data : ", travelPlans)
+
+    return travelPlans;
+
+
+    
+  } catch (error) {
+
+    console.error("error: ",error.message);
+    
+  }
+
+  }
+
+  export const deleteSavedTrip = async (tripId) => {
+    try {
+      // Get the currently logged-in user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+      // Check for authentication error
+      if (authError) {
+        throw new Error('Authentication Error: ' + authError.message);
+      }
+  
+      // Ensure the user is authenticated
+      if (!user) {
+        throw new Error('User is not authenticated.');
+      }
+  
+      // Perform delete operation where trip ID and user ID match
+      const { data, error: deleteError } = await supabase
+        .from('Travel Plan')
+        .delete()
+        .eq('id', tripId)        // Ensure it matches the provided trip ID
+        .eq('user_id', user.id);  // Ensure it matches the logged-in user's ID
+  
+      // Check if the delete operation had an error
+      if (deleteError) {
+        throw new Error('Error deleting travel plan: ' + deleteError.message);
+      }
+  
+      // If successful, return some success message or data
+      return { success: true, message: 'Trip deleted successfully' };
+  
+    } catch (error) {
+      // Handle and log errors
+      console.error('Error in deleteSavedTrip:', error);
+      return { success: false, error: error.message }; // Return error object with message
+    }
+  };
   
   export default supabase;

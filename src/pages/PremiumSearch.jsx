@@ -157,6 +157,16 @@ Format all output in **Markdown**.`
       },
     });
 
+    if (!city) {
+      showTemporaryAlert("Add Data", "Please Provide City", 3000);
+      return;
+    }
+    if (days === 0) {
+      showTemporaryAlert("Add Data", "Please Provide Days", 3000);
+      return;
+    }
+    
+
     try {
       setLoading(true);
       showTemporaryAlert("In Progress...", "Please Wait. Search Request Has Been Made To Server. Be Patient.", 3000)
@@ -182,10 +192,14 @@ Format all output in **Markdown**.`
 
 
   const insertTripData = async ()=>{
+    setLoading(true)
     if(city && travelPlan){
       await insertData(city,travelPlan)
       console.log("data inserted successfully from search page.")
+      showTemporaryAlert("Saving Data", "Please Wait Saving Data", 3000)
+      setLoading(false)
     }
+
   }
 
   return (
@@ -253,7 +267,7 @@ Format all output in **Markdown**.`
           </CardContent>
           <CardFooter className="flex justify-between gap-4">
             <Button onClick={search} disabled={loading} className="w-full">{loading ? "Searching ...": "Search"}</Button>
-            <Button variant="outline" disabled={loading} className="w-full" onClick={insertTripData}><Link to="/saved-trips" >
+            <Button variant="outline" disabled={loading} className="w-full" onClick={insertTripData}><Link to="/saved-trip" >
               Saved Trip
             </Link></Button>
 
@@ -266,7 +280,7 @@ Format all output in **Markdown**.`
               <ReactMarkdown>{travelPlan}</ReactMarkdown>
             </CardContent>
             <CardFooter className="flex justify-center">
-              <Button onClick={insertTripData} >Save Trip</Button>
+              <Button disabled={loading} onClick={insertTripData} >Save Trip</Button>
             </CardFooter>
           </Card>
         )}
