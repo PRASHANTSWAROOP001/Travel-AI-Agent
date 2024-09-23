@@ -41,7 +41,7 @@ import { useNavigate } from 'react-router-dom';
 export default function PremiumSearchPage() {
 
   const [city, setCity] = useState('');
-  const [days, setDays] = useState(0);
+  const [days, setDays] = useState(1);
   const [loading, setLoading] = useState(false);
   const [travelPlan, setTravelPlan] = useState(null);
   const [progress, setProgress] = useState(0);
@@ -96,17 +96,10 @@ export default function PremiumSearchPage() {
   }, [])
 
 
-
-  const handleDays = (e) => {
-    let day = Number(e.target.value)
-    if (day > 0 && day <= 7) {
-      setDays(day)
-    }
-    else if (days > 7) {
-      setDays(7)
-    }
-    else {
-      setDays(1)
+  const handleDays = (value) => {
+    const day = Number(value);
+    if (day > 0 && day <= 3) {
+      setDays(day);
     }
   };
 
@@ -223,14 +216,21 @@ Format all output in **Markdown**.`
                 />
               </div>
               <div className="flex flex-col space-y-3">
-                <Label htmlFor="days">Days</Label>
-                <Input
-                  type="number"
-                  id="days"
-                  value={days}
-                  onChange={handleDays}
-                  placeholder="Enter Days"
-                />
+              <Label htmlFor="days">Days</Label>
+                <Select  value={String(days)} onValueChange={handleDays}>
+                    <SelectTrigger id='days'>
+                      <SelectValue placeholder="Select Days" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Day</SelectItem>
+                      <SelectItem value="2">2 Days</SelectItem>
+                      <SelectItem value="3">3 Days</SelectItem>
+                      <SelectItem value="4">4 Day</SelectItem>
+                      <SelectItem value="5">5 Days</SelectItem>
+                      <SelectItem value="6">6 Days</SelectItem>
+                      <SelectItem value="7">7 Days</SelectItem>
+                    </SelectContent>
+                  </Select>
               </div>
 
               <div className="flex flex-col space-y-3">

@@ -182,5 +182,20 @@ export const getCurrentUser = async () => {
       return { success: false, error: error.message }; // Return error object with message
     }
   };
+
+
+  export const sendPasswordResetEmail = async (email) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+      alert('Password reset email sent!');
+    } catch (error) {
+      console.error('Error sending password reset email:', error.message);
+      alert('There was an error sending the password reset email.');
+    }
+  };
+
+
+
   
   export default supabase;

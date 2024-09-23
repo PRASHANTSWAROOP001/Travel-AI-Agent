@@ -6,11 +6,13 @@ import Layout from "./layout/Layout"
 import ErrorPage from "./pages/ErrorPage"
 import HomePage from "./pages/HomePage"
 
+
 const LoginPage = lazy(() => import("./pages/LoginPage"))
 const SavedTrip = lazy(() => import("./pages/SavedTrip"))
 const SearchPage = lazy(() => import("./pages/SearchPage"))
 const About = lazy(()=>import("./pages/About"))
 const PremiumSearch = lazy(()=>import("./pages/PremiumSearch.jsx"))
+const Reset = lazy(()=>(import('./pages/ResetPage.jsx')))
 
 
 function App() {
@@ -65,6 +67,14 @@ function App() {
         element:(
           <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
             <PremiumSearch/>
+          </Suspense>
+        )
+      },
+      {
+        path:"forgot-password",
+        element:(
+          <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
+            <Reset/>
           </Suspense>
         )
       },
