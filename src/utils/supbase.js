@@ -183,19 +183,44 @@ export const getCurrentUser = async () => {
     }
   };
 
+  const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+
 
   export const sendPasswordResetEmail = async (email) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
-      if (error) throw error;
-      alert('Password reset email sent!');
+        if (!isValidEmail(email)) {
+            throw new Error("Please enter a valid email address.");
+        }
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email);
+        if (error) throw error;
+
+        return { success: true, message: 'Password reset email sent!' };
     } catch (error) {
-      console.error('Error sending password reset email:', error.message);
-      alert('There was an error sending the password reset email.');
+        console.error('Error sending password reset email:', error.message);
+        return { success: false, message: error.message || 'There was an error sending the password reset email.' };
     }
-  };
+};
 
 
+  export const updatePassword = async (password) => {
+    try {
+
+      const {data , error} = await supabase.auth.updateUser({
+        password:password, 
+      })
+
+      if (error){
+        throw new Error("Error while reseting Password: ", error.message)
+      }
+
+      return {success: true, message:"Password Changed SuccessFully"}
+      
+    } catch (error) {
+      console.error("Error While Reseting Password: ", error)
+      return({success:false,message:"Password could not change"})
+    }
+  }
 
   
   export default supabase;

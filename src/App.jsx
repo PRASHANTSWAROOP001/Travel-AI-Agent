@@ -13,6 +13,7 @@ const SearchPage = lazy(() => import("./pages/SearchPage"))
 const About = lazy(()=>import("./pages/About"))
 const PremiumSearch = lazy(()=>import("./pages/PremiumSearch.jsx"))
 const Reset = lazy(()=>(import('./pages/ResetPage.jsx')))
+const ResetPassword = lazy(()=>(import('./pages/ResetPassword.jsx')))
 
 
 function App() {
@@ -75,6 +76,14 @@ function App() {
         element:(
           <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
             <Reset/>
+          </Suspense>
+        )
+      },
+      {
+        path:"reset-password",
+        element:(
+          <Suspense fallback={<div className='text-3xl text-gray-700 mt-10'> Loading... </div>}>
+            <ResetPassword/>
           </Suspense>
         )
       },
