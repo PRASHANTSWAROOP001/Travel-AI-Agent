@@ -13,6 +13,14 @@ import {
   CardTitle,
 } from '../components/ui/card';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Progress } from '../components/ui/progress';
@@ -23,7 +31,7 @@ import  {GoogleGenerativeAI} from "@google/generative-ai"
 
 function SearchPage() {
   const [city, setCity] = useState('');
-  const [days, setDays] = useState(0);
+  const [days, setDays] = useState(1);
   const [loading, setLoading] = useState(false);
   const [travelPlan, setTravelPlan] = useState(null); // State to store the API response
   const [progress, setProgress] = useState(0);
@@ -33,18 +41,14 @@ function SearchPage() {
     setCity(e.target.value);
   };
 
-  const handleDays = (e) => {
-    const day = Number(e.target.value)
-    if (day > 0 && day <=3){
-      setDays(day)
-    }
-    else if (day > 3){
-      setDays(3)
-    }
-    else{
-      setDays(1)
+  const handleDays = (value) => {
+    const day = Number(value);
+    if (day > 0 && day <= 3) {
+      setDays(day);
     }
   };
+
+
 
   const showAlert = () => {
     setSearchAlert(true);
@@ -110,8 +114,6 @@ function SearchPage() {
 
       const result = await model.generateContent(prompt);
 
-      console.log(result.response.text())
-
       setTravelPlan(result.response.text());
   
    
@@ -121,7 +123,7 @@ function SearchPage() {
     } finally {
       setProgress(100)
       setCity('');
-      setDays(0);
+      setDays(1);
       setLoading(false);
     }
   };
@@ -152,14 +154,17 @@ function SearchPage() {
                   />
                 </div>
                 <div className="flex flex-col space-y-3">
-                  <Label htmlFor="days">Days</Label>
-                  <Input
-                    type="number"
-                    id="days"
-                    value={days}
-                    onChange={handleDays}
-                    placeholder="Enter Days"
-                  />
+                <Label htmlFor="days">Days</Label>
+                <Select  value={String(days)} onValueChange={handleDays}>
+                    <SelectTrigger id='days'>
+                      <SelectValue placeholder="Select Days" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Day</SelectItem>
+                      <SelectItem value="2">2 Days</SelectItem>
+                      <SelectItem value="3">3 Days</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </form>
